@@ -24,8 +24,20 @@ const ManagedCreditPosGlobalState = (PosGlobalState) => class extends PosGlobalS
                         ]
 
         if (!orders || !orders.length) {
-            return Promise.resolve([]);
+            return Promise.resolve(
+                {'success':false,
+                 'message':'Nothing to order'}
+                );
         }
+
+
+        if(!j.to_invoice){
+             return {
+                'success':false,
+                'message':'Invoice is required for credit orders.'
+             };
+        }
+
         this.set_synch('connecting', orders.length);
         options = options || {};
 

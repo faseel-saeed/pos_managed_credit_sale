@@ -16,7 +16,7 @@ const ManagedCreditPosGlobalState = (PosGlobalState) => class extends PosGlobalS
     // - timeout: timeout for the rpc call in ms
     // returns a promise that resolves with the list of
     // server generated ids for the validated orders
-    validate_credit_limit (order, options) {
+    validate_credit_limit (order, isCreditTransaction, options) {
 
         let j = order.export_as_JSON();
         let orders = [
@@ -30,8 +30,10 @@ const ManagedCreditPosGlobalState = (PosGlobalState) => class extends PosGlobalS
                 );
         }
 
+        //console.log('j:',j);
 
-        if(!j.to_invoice){
+
+        if(isCreditTransaction && !j.to_invoice){
              return {
                 'success':false,
                 'message':'Invoice is required for credit orders.'

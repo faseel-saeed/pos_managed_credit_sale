@@ -17,7 +17,13 @@ odoo.define('pos_managed_credit_sale.PaymentScreen', function(require) {
 
         async _finalizeValidation() {
 
-            //console.log("==========_finalizeValidation==========");
+            /*console.log("==========_finalizeValidation==========");
+
+            console.log("==========paymentLines==========");
+            console.log(this.paymentLines);
+            console.log("==========paymentLines=========="); */
+
+
             let syncOrderResult, hasError, creditCheckResult;
             let isOverLimit = false;
             let title= '';
@@ -26,9 +32,12 @@ odoo.define('pos_managed_credit_sale.PaymentScreen', function(require) {
             if(this._is_splitOrder()){
                 try {
                     //console.log("==========creditCheckResult==========");
-                    let creditCheckResult = await this.env.pos.validate_credit_limit(this.currentOrder);
-                    console.log(creditCheckResult);
+                    let isCreditTransaction = this._is_credit();
+                    let creditCheckResult = await this.env.pos.validate_credit_limit(this.currentOrder, isCreditTransaction);
+                    //console.log(creditCheckResult);
                     //console.log("==========creditCheckResult==========");
+
+                    //console.log(f);
 
                     if(!creditCheckResult.success){
                         isOverLimit = true;
@@ -60,9 +69,18 @@ odoo.define('pos_managed_credit_sale.PaymentScreen', function(require) {
         }
 
         _is_splitOrder(){
+            //console.log(payment);
             const splitPayments = this.paymentLines.filter(payment => payment.payment_method.split_transactions);
             return splitPayments.length>0;
 
+        }
+
+
+
+        _is_credit(){
+            const creditPayments = this.paymentLines.filter(payment => payment.payment_method.type=='pay_later');
+            //console.log('credit',creditPayments);
+            return creditPayments.length>0;
         }
 
 
